@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.MusicDao">
+
+    <resultMap type="Music" id="musicResultMap" >
+        <id property="musicId" column="music_id"/>
+        <result property="musicName" column="music_name"/>
+        <result property="musicArtist" column="music_artist"/>
+        <result property="musicAlbum" column="music_album"/>
+        <result property="musicIdInAlbum" column="music_album_id"/>
+        <result property="musicDate" column="music_release_date"/>
+        <result property="musicPrice" column="music_price"/>
+    </resultMap>
+
+    <insert id="addMusic" parameterType="Music">
+        INSERT INTO music(music_name,music_artist,music_album,music_album_id,music_release_date,music_price)
+        VALUE (#{musicName},#{musicArtist}, #{musicAlbum}, #{musicIdInAlbum},#{musicDate},#{musicPrice})
+    </insert>
+
+    <delete id="deleteMusicById" parameterType="long">
+        DELETE FROM music WHERE music_id=#{musicId}
+    </delete>
+
+    <update id="updateMusic" parameterType="Music">
+        UPDATE music
+        SET music_name = #{musicName},music_artist = #{musicArtist},music_album = #{musicAlbum},music_album_id = #{musicIdInAlbum},music_release_date = #{musicDate},music_price = #{musicPrice}
+        WHERE  music_id = #{musicId}
+    </update>
+
+    <select id="queryMusicById" resultType="Music" parameterType="long">
+        SELECT *
+        FROM music
+        WHERE music_id = #{musicId}
+    </select>
+
+    <select id="queryAllMusic" resultMap="musicResultMap">
+        SELECT *
+        FROM music
+    </select>
+
+    <select id="searchMusic" resultMap="musicResultMap" parameterType="java.lang.String">
+        SELECT *
+        FROM music
+        WHERE music_name LIKE CONCAT("%",#{str},"%")
+        OR music_artist LIKE CONCAT("%",#{str},"%")
+        OR music_album LIKE CONCAT("%",#{str},"%")
+    </select>
+
+</mapper>

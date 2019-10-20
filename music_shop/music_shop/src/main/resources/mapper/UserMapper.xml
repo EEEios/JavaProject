@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.UserDao">
+
+    <resultMap type="User" id="userResultMap" >
+        <id property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="password" column="user_password"/>
+        <result property="power" column="user_power"/>
+    </resultMap>
+
+    <insert id="addUser" parameterType="User">
+        INSERT INTO users(user_name,user_password,user_power)
+        VALUE (#{userName},#{password}, #{power})
+    </insert>
+
+    <delete id="deleteUserById" parameterType="long">
+        DELETE FROM users WHERE user_id=#{userId}
+    </delete>
+
+    <update id="updateUser" parameterType="User">
+        UPDATE users
+        SET user_name = #{userName},user_password = #{password},user_power = #{power}
+        WHERE  user_id = #{userId}
+    </update>
+
+    <select id="queryUserById" resultType="User" parameterType="long">
+        SELECT *
+        FROM users
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="queryAllUser" resultMap="userResultMap">
+        SELECT *
+        FROM users
+    </select>
+
+    <select id="searchUser" resultMap="userResultMap" parameterType="java.lang.String">
+        SELECT *
+        FROM users
+        WHERE user_name LIKE CONCAT("%",#{str},"%")
+        OR user_power LIKE CONCAT("%",#{str},"%")
+        OR user_id LIKE CONCAT("%",#{str},"%")
+    </select>
+
+    <select id="login" resultMap="userResultMap" parameterType="User">
+        SELECT *
+        FROM users
+        WHERE user_name = #{userName} AND user_password = #{password}
+    </select>
+
+</mapper>
