@@ -3,9 +3,12 @@
 #include "iostream"
 #include "string"
 #include "string.h"
+#include "vector"
+
 #define MAX_POS_NUM 50
 #define INFINITY 65535
 using namespace std;
+using std::vector;
 
 /**
  * position结构
@@ -15,9 +18,14 @@ using namespace std;
  */
 typedef struct{
     int id;
-    char name[100];
-    char intro[200];
+    string name;
+    string intro;
 }position;
+
+typedef struct{
+    int distance;
+    vector<int>interalNode;
+}FloyNode;
 
 /**
  * SchoolMap结构
@@ -28,28 +36,64 @@ typedef struct{
 typedef struct{
     position pos[MAX_POS_NUM];
     int Edge[MAX_POS_NUM][MAX_POS_NUM]; //记录权值
+    FloyNode FolyedMap[MAX_POS_NUM][MAX_POS_NUM];
     int vn;
     int en;
 }SchoolMap;
 
+
+/**
+ *用户端功能:
+ *  1.查询两点之间的最短距离；
+ *  2.查询周围景点；
+ *  3.查询停车场使用情况；
+ *管理端功能：
+ *  1.包含用户端功能
+ *  2.增删景点节点
+ *  3.查询停车场使用情况；
+ */
 void init(SchoolMap &M);
 void createMap(SchoolMap *M);   //创建地图
-void getPos(SchoolMap *G, int v);   //获得对应地图简介
-void ToDestination(SchoolMap *G, int v, int w);     //获取最短路径
+int getPosId(SchoolMap &M, string name); //获取目标位置id
+void getPosInfo(SchoolMap &M, string name); //获取目标位置简介
+void queryShortEdge(SchoolMap *M); //查询两地之间的最短路线
+void queryAround(SchoolMap *M); //搜索周围景点
+void addPos(SchoolMap *M);
+void deletePost(SchoolMap *M);
+
 
 void createMap(SchoolMap &M){
-    M.vn = 6;
-    M.en = 8;
-
     int i,j;
-
     for (i = 0; i < MAX_POS_NUM; i++)
     {
         for (int j = 0; j < MAX_POS_NUM; j++)
         {
-            M.Edge[i][j] = INFINITY;
+            if(i==j) M.Edge[i][j] = 0;
+            else M.Edge[i][j] = INFINITY;
         }
     }   //设置边权值为一个较大的数
+}
+
+int getPosId(SchoolMap *M, string name){
+    for(int i=0;i<M->vn;i++){
+        if(M->pos[i].name.find(name)!=M->pos[i].name.npos){
+            return i+1;
+        }
+    }
+    return -1;
+}
+
+void getPosInfo(SchoolMap *M, string name){
+    for(int i=0;i<M->vn;i++){
+        if(M->pos[i].name.find(name)!=M->pos[i].name.npos){
+            cout<<"地点简介：";
+            cout<<M->pos[i].intro<<endl;
+        }
+    }
+}
+
+string getPosById(SchoolMap *M, int id){
+    return M->pos[id-1].name;
 }
 
 void init(SchoolMap &M){
@@ -62,14 +106,14 @@ void init(SchoolMap &M){
         "┃                  ‖                     ╭─────────╮                              ‖          ┃",
         "┃                  ‖==================== |  图书馆  |                             ‖          ┃",
         "┃                  ‖                    ╰───────────╯                             ‖          ┃",
-        "┃                ╭──╮                         ‖                                   ‖          ┃",
-        "┃                | 校|========================‖                                   ‖          ┃",
-        "┃                | 史|                        ‖                                   ‖          ┃",
-        "┃                | 馆|                     ╭────────╮                              ‖          ┃",
-        "┃               ╰────╯                     |  行政楼 |                             ‖          ┃",
-        "┃                  ‖                     ╰──────────╯                         ╭──────────╮    ┃",
-        "┃                  ‖===========================‖=============================|  泰山区   |   ┃",
-        "┃                                                                             ╰────────────╯   ┃",
+        "┃                  ‖                       ‖                                   ‖          ┃",
+        "┃                  ‖                       ‖                                   ‖          ┃",
+        "┃                  ‖                       ‖                                   ‖          ┃",
+        "┃                ╭────╮                    ‖                           ‖          ┃",
+        "┃                | 校|                    ‖                          ‖          ┃",
+        "┃                | 史|                       ╭────────╮                       ╭──────────╮    ┃",
+        "┃                | 馆|========================|  行政楼 |======================|  泰山区   |   ┃",
+        "┃                ╰────╯                      ╰──────────╯                         ╰────────────╯   ┃",
         "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
     };
 
@@ -79,29 +123,24 @@ void init(SchoolMap &M){
 
     createMap(M);
 
+    M.vn = 6;
+    M.en = 8;
+
     M.Edge[0][1]=800;
     M.Edge[0][2]=2000;
-    M.Edge[0][4]=2200;
     M.Edge[2][3]=400;
-    M.Edge[2][4]=900;
+    M.Edge[2][4]=200;
     M.Edge[5][1]=3500;
     M.Edge[5][3]=1000;
     M.Edge[5][4]=600;
+
     M.Edge[1][0]=800;
     M.Edge[2][0]=2000;
-    M.Edge[4][0]=2200;
     M.Edge[3][2]=400;
-    M.Edge[4][2]=900;
+    M.Edge[4][2]=200;
     M.Edge[1][5]=3500;
     M.Edge[3][5]=1000;
     M.Edge[4][5]=600;
-
-    for(int i=0;i<M.vn;i++){
-        for(int j=0;j<M.vn;j++)
-            printf("%10d",M.Edge[i][j]);
-        printf("\n");
-    }
-
 
     position pos[M.vn]={
         {1,"泰山区","泰山宿舍区"},
@@ -114,20 +153,86 @@ void init(SchoolMap &M){
 
     for(int i=0;i<M.vn;i++){
         M.pos[i].id = pos[i].id;
-        strcpy(M.pos[i].intro,pos[i].intro);
-        strcpy(M.pos[i].name,pos[i].name);
+        M.pos[i].intro=pos[i].intro;
+        M.pos[i].name=pos[i].name;
     }
 
     for(int i=0;i<M.vn;i++){
-        cout<<M.pos[i].name<<endl;
-        cout<<M.pos[i].intro<<endl;
+        for(int j=0;j<M.vn;j++)
+            printf("%10d",M.Edge[i][j]);
+        cout<<endl;
     }
+    //Floyed图初始化
+    for(int i=0;i<M.vn;i++){
+        for(int j=0;j<M.vn;j++)
+            M.FolyedMap[i][j].distance=M.Edge[i][j];
+    }
+
+    vector<int>::iterator temp1,temp2,temp3;
+    for(int k=0; k<M.vn; k++)
+        for(int i=0; i<M.vn; i++)
+            for(int j=0; j<M.vn; j++)
+                if(M.FolyedMap[i][k].distance+M.FolyedMap[k][j].distance < M.FolyedMap[i][j].distance){
+                    M.FolyedMap[i][j].distance=M.FolyedMap[i][k].distance+M.FolyedMap[k][j].distance;
+                    M.FolyedMap[i][j].interalNode.push_back(k);
+
+//                    temp3 = M.FolyedMap[i][j].interalNode.end();
+//                    temp1 = M.FolyedMap[i][k].interalNode.begin();
+//                    temp2 = M.FolyedMap[i][k].interalNode.end();
+//                    M.FolyedMap[i][j].interalNode.insert(temp3,temp1,temp2);
+//                    temp1 = M.FolyedMap[k][j].interalNode.begin();
+//                    temp2 = M.FolyedMap[k][j].interalNode.end();
+//                    M.FolyedMap[i][j].interalNode.insert(temp3,temp1,temp2);
+                }
+
+    SchoolMap *G=&M;
+    for(int i=0;i<M.vn;i++)
+        for(int j=0;j<M.vn;j++){
+
+        cout<<getPosById(G, i);
+//        <<"  "<<getPosById(G, j)<<"    ";
+        cout<<"okok";
+            for(int k=0;i<M.FolyedMap[i][j].interalNode.size();k++)
+                cout<<getPosById(G, k)<<"  ";
+            cout<<endl;
+        }
+
+//    for(int i=0;i<M.vn;i++){
+//        for(int j=0;j<M.vn;j++)
+//            printf("%10d",M.FolyedMap[i][j]);
+//        cout<<endl;
+//    }
+//    SchoolMap *G=&M;
+//    vector<int>::iterator node;
+//    for(int i=0;i<M.vn;i++)
+//        for(int j=0;j<M.vn;j++)
+//            for(node=M.FolyedMap[i][j].interalNode.begin();
+//                node!=M.FolyedMap[i][j].interalNode.end();node++)
+//                {
+//                    cout<<getPosById(G, *node)<<" "<<endl;
+//                }
 
 }
 
-int getPosId(SchoolMap *M, string name){
-    for(int i=0;i<vn;i++){
-        if(M->pos[i])
+void queryShortEdge(SchoolMap *M){
+    string startPos,endPos;
+    int startPosId,endPosId;
+
+    cout<<"请输入起点:";
+    cin>>startPos;
+    startPosId=getPosId(M, startPos);
+    cout<<"请输入终点:";
+    cin>>endPos;
+    endPosId=getPosId(M, endPos);
+
+    cout<<"距离为：";
+    cout<<M->FolyedMap[startPosId-1][endPosId-1].distance;
+    cout<<"经过的点为：";
+    int len=M->FolyedMap[startPosId-1][endPosId-1].interalNode.size();
+
+    for(int i=0;i<len;i++){
+        int id = M->FolyedMap[startPosId-1][endPosId-1].interalNode[i];
+        cout<<getPosById(M,id)<<" ";
     }
 }
 
@@ -137,4 +242,11 @@ int main()
     M=(SchoolMap *)malloc(sizeof(SchoolMap));
     init(*M);
 
+//    string name;
+//    cout<<"请输入要查询的地址：";
+//    cin>>name;
+//    getPosInfo( M, name);
+//    cout<<getPosId(M, name)<<endl;
+
+//    queryShortEdge(M);
 }
