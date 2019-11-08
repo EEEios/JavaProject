@@ -1,0 +1,6 @@
+1 root root 1
+2 admin password 1
+3 123 123 0
+4 PanD 123 0
+5 NASA 123 0
+6 qq qq 0

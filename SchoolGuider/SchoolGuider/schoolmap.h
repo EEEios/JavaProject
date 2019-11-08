@@ -11,7 +11,7 @@
 #include "string.h"
 #include "vector"
 #define MAX_POS_NUM 50
-#define INFINITY 65535
+#define INF 65535
 using namespace std;
 using std::vector;
 
@@ -80,7 +80,7 @@ void createMap(SchoolMap &M){
         for (j = 0; j < MAX_POS_NUM; j++)
         {
             if(i==j) M.Edge[i][j] = 0;
-            else M.Edge[i][j] = INFINITY;
+            else M.Edge[i][j] = INF;
         }
     }   //设置边权值为一个较大的数
 }
