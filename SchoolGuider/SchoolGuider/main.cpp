@@ -226,23 +226,19 @@ void init(SchoolMap &M){
 //                cout<<endl;
 //            }
     }
-
-
-
-    SchoolMap *G=&M;
-    vector<int>::iterator node;
-    for(int i=0;i<M.vn;i++)
-        for(int j=0;j<M.vn;j++){
-            if(M.FolyedMap[i][j].interalNode.size()==0) continue;
-            cout<<M.pos[i].name<<"  "<<M.pos[j].name<<"   ";
-            for(node=M.FolyedMap[i][j].interalNode.begin();
-                node!=M.FolyedMap[i][j].interalNode.end();node++)
-                {
-                    cout<<getPosByIdx(G, *node)<<" ";
-                }
-            cout<<endl;
-        }
-
+//    SchoolMap *G=&M;
+//    vector<int>::iterator node;
+//    for(int i=0;i<M.vn;i++)
+//        for(int j=0;j<M.vn;j++){
+//            if(M.FolyedMap[i][j].interalNode.size()==0) continue;
+//            cout<<M.pos[i].name<<"  "<<M.pos[j].name<<"   ";
+//            for(node=M.FolyedMap[i][j].interalNode.begin();
+//                node!=M.FolyedMap[i][j].interalNode.end();node++)
+//                {
+//                    cout<<getPosByIdx(G, *node)<<" ";
+//                }
+//            cout<<endl;
+//        }
 }
 
 /**
@@ -260,16 +256,36 @@ void queryShortEdge(SchoolMap *M){
     cin>>endPos;
     endPosId=getPosId(M, endPos);
 
-    cout<<"距离为：";
-    cout<<M->FolyedMap[startPosId-1][endPosId-1].distance;
+    int startIdx = startPosId-1;
+    int endIdx = endPosId-1;
+    int pathFinder = startIdx;
+    int len=M->FolyedMap[startIdx][endIdx].interalNode.size();
+    int inNode[MAX_POS_NUM],n=0,useFlag[len]={0};
+    int i,j,nextNode;
+
+    cout<<"距离为："<<M->FolyedMap[startIdx][endIdx].distance<<endl;
     cout<<"路线为：";
-    int len=M->FolyedMap[startPosId-1][endPosId-1].interalNode.size();
-    cout<<M->pos[startPosId-1].name<<"-->";
-    for(int i=0;i<len;i++){
-        int id = M->FolyedMap[startPosId-1][endPosId-1].interalNode[i];
-        cout<<getPosByIdx(M,id)<<"-->";
+    cout<<M->pos[startIdx].name<<"-->";
+    while(n<len){
+        for(i=0;i<M->vn;i++){
+            int distance = M->Edge[pathFinder][i];
+            if(distance==65535||distance==0) continue;
+            for(j=0;j<len;j++){
+                nextNode=M->FolyedMap[startIdx][endIdx].interalNode[j];
+                if(i==nextNode){
+                    useFlag[j]=1;
+                    n++;
+                    break;
+                }
+            }
+            if(useFlag[j]==1){
+                cout<<M->pos[nextNode].name<<"-->";
+                pathFinder = nextNode;
+                break;
+            }
+        }
     }
-    cout<<M->pos[endPosId-1].name;
+    cout<<M->pos[endIdx].name;
 }
 
 //入口
