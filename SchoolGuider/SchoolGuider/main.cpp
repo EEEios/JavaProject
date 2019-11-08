@@ -61,7 +61,10 @@ void queryAround(SchoolMap *M); //搜索周围景点
 void addPos(SchoolMap *M);
 void deletePost(SchoolMap *M);
 
-
+/**
+ *  初始化图
+ *  参数：SchoolMap引用
+ */
 void createMap(SchoolMap &M){
     int i,j;
     for (i = 0; i < MAX_POS_NUM; i++)
@@ -74,6 +77,11 @@ void createMap(SchoolMap &M){
     }   //设置边权值为一个较大的数
 }
 
+/**
+ *  根据名称返回景点id
+ *  参数：SchoolMap指针、string name
+ *  返回值：id
+ */
 int getPosId(SchoolMap *M, string name){
     for(int i=0;i<M->vn;i++){
         if(M->pos[i].name.find(name)!=M->pos[i].name.npos){
@@ -83,6 +91,10 @@ int getPosId(SchoolMap *M, string name){
     return -1;
 }
 
+/**
+ *  根据景点名称打印简介
+ *  参数：SchoolMap指针、string name
+ */
 void getPosInfo(SchoolMap *M, string name){
     for(int i=0;i<M->vn;i++){
         if(M->pos[i].name.find(name)!=M->pos[i].name.npos){
@@ -92,10 +104,32 @@ void getPosInfo(SchoolMap *M, string name){
     }
 }
 
-string getPosById(SchoolMap *M, int id){
-    return M->pos[id-1].name;
+/**
+ *  根据索引返回名称
+ *  参数：SchoolMap指针、int idx
+ */
+string getPosByIdx(SchoolMap *M, int idx){
+    return M->pos[idx].name;
 }
 
+void findShortRoute(SchoolMap *M, vector<int> &route, int startPos, int endPos, int midPos){
+    if(startPos==endPos) return;
+        route.push_back(midPos);
+    if(!M->FolyedMap[startPos][midPos].interalNode.empty()){
+        midPos=M->FolyedMap[startPos][midPos].interalNode[0];
+        findShortRoute(M, route,startPos, midPos, midPos);
+    }
+    if(!M->FolyedMap[midPos][endPos].interalNode.empty()){
+        midPos=M->FolyedMap[midPos][endPos].interalNode[0];
+        findShortRoute(M, route, midPos, endPos, midPos);
+    }
+
+}
+
+/**
+ *  程序初始化
+ *  参数：SchoolMap引用
+ */
 void init(SchoolMap &M){
 
     string visualSchoolMap[]={
@@ -116,10 +150,10 @@ void init(SchoolMap &M){
         "┃                ╰────╯                      ╰──────────╯                         ╰────────────╯   ┃",
         "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
     };
-
     for(int i=0;i<sizeof(visualSchoolMap)/sizeof(visualSchoolMap[0]);i++){
         cout<<visualSchoolMap[i]<<endl;
     }
+
 
     createMap(M);
 
@@ -158,62 +192,62 @@ void init(SchoolMap &M){
     }
 
     for(int i=0;i<M.vn;i++){
+        cout<<getPosByIdx(&M,i)<<"  ";
         for(int j=0;j<M.vn;j++)
             printf("%10d",M.Edge[i][j]);
         cout<<endl;
     }
+
     //Floyed图初始化
     for(int i=0;i<M.vn;i++){
         for(int j=0;j<M.vn;j++)
             M.FolyedMap[i][j].distance=M.Edge[i][j];
     }
 
-    vector<int>::iterator temp1,temp2,temp3;
-    for(int k=0; k<M.vn; k++)
-        for(int i=0; i<M.vn; i++)
-            for(int j=0; j<M.vn; j++)
+    for(int k=0; k<M.vn; k++){
+        for(int i=0; i<M.vn; i++){
+            for(int j=0; j<M.vn; j++){
+                if(i==k||j==k)
+                    continue;
                 if(M.FolyedMap[i][k].distance+M.FolyedMap[k][j].distance < M.FolyedMap[i][j].distance){
-                    M.FolyedMap[i][j].distance=M.FolyedMap[i][k].distance+M.FolyedMap[k][j].distance;
-                    M.FolyedMap[i][j].interalNode.push_back(k);
-
-//                    temp3 = M.FolyedMap[i][j].interalNode.end();
-//                    temp1 = M.FolyedMap[i][k].interalNode.begin();
-//                    temp2 = M.FolyedMap[i][k].interalNode.end();
-//                    M.FolyedMap[i][j].interalNode.insert(temp3,temp1,temp2);
-//                    temp1 = M.FolyedMap[k][j].interalNode.begin();
-//                    temp2 = M.FolyedMap[k][j].interalNode.end();
-//                    M.FolyedMap[i][j].interalNode.insert(temp3,temp1,temp2);
+                        M.FolyedMap[i][j].distance=M.FolyedMap[i][k].distance+M.FolyedMap[k][j].distance;
+                        M.FolyedMap[i][j].interalNode.clear();
+                        findShortRoute(&M,M.FolyedMap[i][j].interalNode,i,j,k);
                 }
-
-    SchoolMap *G=&M;
-    for(int i=0;i<M.vn;i++)
-        for(int j=0;j<M.vn;j++){
-
-        cout<<getPosById(G, i);
-//        <<"  "<<getPosById(G, j)<<"    ";
-        cout<<"okok";
-            for(int k=0;i<M.FolyedMap[i][j].interalNode.size();k++)
-                cout<<getPosById(G, k)<<"  ";
-            cout<<endl;
+            }
         }
 
-//    for(int i=0;i<M.vn;i++){
-//        for(int j=0;j<M.vn;j++)
-//            printf("%10d",M.FolyedMap[i][j]);
-//        cout<<endl;
-//    }
+//            cout<<"====="<<k<<"====="<<endl;
+//            for(int i=0;i<M.vn;i++){
+//                cout<<getPosByIdx(&M,i)<<"  ";
+//                for(int j=0;j<M.vn;j++)
+//                    printf("%10d",M.FolyedMap[i][j].distance);
+//                cout<<endl;
+//            }
+    }
+
+
+
 //    SchoolMap *G=&M;
 //    vector<int>::iterator node;
 //    for(int i=0;i<M.vn;i++)
-//        for(int j=0;j<M.vn;j++)
+//        for(int j=0;j<M.vn;j++){
+//            if(M.FolyedMap[i][j].interalNode.size()==0) continue;
+//            cout<<M.pos[i].name<<"  "<<M.pos[j].name<<"   ";
 //            for(node=M.FolyedMap[i][j].interalNode.begin();
 //                node!=M.FolyedMap[i][j].interalNode.end();node++)
 //                {
-//                    cout<<getPosById(G, *node)<<" "<<endl;
+//                    cout<<getPosByIdx(G, *node)<<" ";
 //                }
+//            cout<<endl;
+//        }
 
 }
 
+/**
+ *  根据foly图获得最短距离，并对路线进行排序
+ *  参数：SchoolMap引用
+ */
 void queryShortEdge(SchoolMap *M){
     string startPos,endPos;
     int startPosId,endPosId;
@@ -227,14 +261,16 @@ void queryShortEdge(SchoolMap *M){
 
     cout<<"距离为：";
     cout<<M->FolyedMap[startPosId-1][endPosId-1].distance;
-    cout<<"经过的点为：";
+    cout<<"路线为：";
     int len=M->FolyedMap[startPosId-1][endPosId-1].interalNode.size();
 
     for(int i=0;i<len;i++){
         int id = M->FolyedMap[startPosId-1][endPosId-1].interalNode[i];
-        cout<<getPosById(M,id)<<" ";
+        cout<<getPosByIdx(M,id)<<" ";
     }
 }
+
+//入口
 
 int main()
 {
@@ -248,5 +284,5 @@ int main()
 //    getPosInfo( M, name);
 //    cout<<getPosId(M, name)<<endl;
 
-//    queryShortEdge(M);
+    queryShortEdge(M);
 }
