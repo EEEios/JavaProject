@@ -1,6 +1,7 @@
 # depslib dependency file v1.0
-1573195522 source:c:\users\e10s\desktop\schoolguider\schoolguider\main.cpp
+1573197767 source:c:\users\e10s\desktop\schoolguider\schoolguider\main.cpp
 	"stdio.h"
+	"iomanip"
 	"stdlib.h"
 	"iostream"
 	"string"

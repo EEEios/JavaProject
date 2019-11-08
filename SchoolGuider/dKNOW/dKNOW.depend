@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1573196128 source:c:\users\e10s\desktop\schoolguider\dknow\main.cpp
+	<iostream>
+	<windows.h>
+	<conio.h>
+	<time.h>
+	<list>
+	<string>
+	<stdio.h>
+

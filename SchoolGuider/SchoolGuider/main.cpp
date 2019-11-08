@@ -1,4 +1,5 @@
 #include "stdio.h"
+#include "iomanip"
 #include "stdlib.h"
 #include "iostream"
 #include "string"
@@ -55,11 +56,11 @@ typedef struct{
 void init(SchoolMap &M);
 void createMap(SchoolMap *M);   //创建地图
 int getPosId(SchoolMap &M, string name); //获取目标位置id
-void getPosInfo(SchoolMap &M, string name); //获取目标位置简介
 void queryShortEdge(SchoolMap *M); //查询两地之间的最短路线
 void queryAround(SchoolMap *M); //搜索周围景点
 void addPos(SchoolMap *M);
 void deletePost(SchoolMap *M);
+
 
 /**
  *  初始化图
@@ -137,18 +138,18 @@ void init(SchoolMap &M){
         "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
         "┃  ╭──────────╮                                                                ╭─────────╮     ┃",
         "┃  |  华山区   |============================================================== |  启林区  |    ┃",
-        "┃ ╰────────────╯   ‖                                                          ╰──────────╯    ┃",
+        "┃ ╰────────────╯   ‖                                                         ╰───────────╯    ┃",
         "┃                  ‖                     ╭─────────╮                              ‖          ┃",
         "┃                  ‖==================== |  图书馆  |                             ‖          ┃",
         "┃                  ‖                    ╰───────────╯                             ‖          ┃",
-        "┃                  ‖                       ‖                                   ‖          ┃",
-        "┃                  ‖                       ‖                                   ‖          ┃",
-        "┃                  ‖                       ‖                                   ‖          ┃",
-        "┃                ╭────╮                    ‖                           ‖          ┃",
-        "┃                | 校|                    ‖                          ‖          ┃",
-        "┃                | 史|                       ╭────────╮                       ╭──────────╮    ┃",
+        "┃                  ‖                           ‖                                 ‖          ┃",
+        "┃                  ‖                           ‖                                 ‖          ┃",
+        "┃                  ‖                           ‖                                 ‖          ┃",
+        "┃                ╭──╮                           ‖                                 ‖          ┃",
+        "┃                | 校|                          ‖                                 ‖          ┃",
+        "┃                | 史|                        ╭────────╮                       ╭──────────╮    ┃",
         "┃                | 馆|========================|  行政楼 |======================|  泰山区   |   ┃",
-        "┃                ╰────╯                      ╰──────────╯                         ╰────────────╯   ┃",
+        "┃               ╰────╯                       ╰──────────╯                     ╰────────────╯   ┃",
         "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
     };
     for(int i=0;i<sizeof(visualSchoolMap)/sizeof(visualSchoolMap[0]);i++){
@@ -192,12 +193,12 @@ void init(SchoolMap &M){
         M.pos[i].name=pos[i].name;
     }
 
-    for(int i=0;i<M.vn;i++){
-        cout<<getPosByIdx(&M,i)<<"  ";
-        for(int j=0;j<M.vn;j++)
-            printf("%10d",M.Edge[i][j]);
-        cout<<endl;
-    }
+//    for(int i=0;i<M.vn;i++){
+//        cout<<getPosByIdx(&M,i)<<"  ";
+//        for(int j=0;j<M.vn;j++)
+//            printf("%10d",M.Edge[i][j]);
+//        cout<<endl;
+//    }
 
     //Floyed图初始化
     for(int i=0;i<M.vn;i++){
@@ -217,28 +218,7 @@ void init(SchoolMap &M){
                 }
             }
         }
-
-//            cout<<"====="<<k<<"====="<<endl;
-//            for(int i=0;i<M.vn;i++){
-//                cout<<getPosByIdx(&M,i)<<"  ";
-//                for(int j=0;j<M.vn;j++)
-//                    printf("%10d",M.FolyedMap[i][j].distance);
-//                cout<<endl;
-//            }
     }
-//    SchoolMap *G=&M;
-//    vector<int>::iterator node;
-//    for(int i=0;i<M.vn;i++)
-//        for(int j=0;j<M.vn;j++){
-//            if(M.FolyedMap[i][j].interalNode.size()==0) continue;
-//            cout<<M.pos[i].name<<"  "<<M.pos[j].name<<"   ";
-//            for(node=M.FolyedMap[i][j].interalNode.begin();
-//                node!=M.FolyedMap[i][j].interalNode.end();node++)
-//                {
-//                    cout<<getPosByIdx(G, *node)<<" ";
-//                }
-//            cout<<endl;
-//        }
 }
 
 /**
@@ -285,11 +265,24 @@ void queryShortEdge(SchoolMap *M){
             }
         }
     }
-    cout<<M->pos[endIdx].name;
+    cout<<M->pos[endIdx].name<<endl;
 }
 
-//入口
+void queryAllPos(SchoolMap *M){
+    cout<<"校内主要景点如下："<<endl;
+    cout<<endl;
+    cout.setf(ios::left);
+    cout << setw(10) <<"景点名称"<< " "<<"景点简介"<<endl;
+    cout<<"---------------------------"<<endl;
+    for(int i=0;i<M->vn;i++){
+        cout.setf(ios::left);
+        cout << setw(10) <<M->pos[i].name << " "<<M->pos[i].intro<<endl;
+    }
+}
 
+/**
+ *  主函数
+ */
 int main()
 {
     SchoolMap *M;
@@ -302,5 +295,8 @@ int main()
 //    getPosInfo( M, name);
 //    cout<<getPosId(M, name)<<endl;
 
+
     queryShortEdge(M);
+
+    queryAllPos(M);
 }
