@@ -1,5 +1,15 @@
 # depslib dependency file v1.0
-1573197767 source:c:\users\e10s\desktop\schoolguider\schoolguider\main.cpp
+1573199005 source:c:\users\e10s\desktop\schoolguider\schoolguider\main.cpp
+	"stdio.h"
+	"iomanip"
+	"stdlib.h"
+	"iostream"
+	"string"
+	"string.h"
+	"vector"
+	"schoolmap.h"
+
+1573214662 c:\users\e10s\desktop\schoolguider\schoolguider\schoolmap.h
 	"stdio.h"
 	"iomanip"
 	"stdlib.h"
