@@ -7,27 +7,25 @@
 #include <stdio.h>
 #define KEYDOWN(vk_code) ((::GetKeyState(vk_code)&0x8000)?1:0)
 using namespace std;
-int listen()
-       {
-           if(KEYDOWN(VK_RETURN))return 8;
-           if(KEYDOWN(0x52))
-           return 5;
-           if(KEYDOWN(VK_SPACE))
-           return 6;
-           if(KEYDOWN(VK_ESCAPE))
-           return 7;
-           if(KEYDOWN(VK_UP)||KEYDOWN(0x57))
-           return 1;
-           if(KEYDOWN(VK_DOWN)||KEYDOWN(0x53))
-           return 4;
-           if(KEYDOWN(VK_LEFT)||KEYDOWN(0x41))
-           return 2;
-           if(KEYDOWN(VK_RIGHT)||KEYDOWN(0x44))
-           return 3;
-           return 0;
-       }
-void screen()
-{
+int listen(){
+    if(KEYDOWN(VK_RETURN))return 8;
+    if(KEYDOWN(0x52))
+    return 5;
+    if(KEYDOWN(VK_SPACE))
+    return 6;
+    if(KEYDOWN(VK_ESCAPE))
+    return 7;
+    if(KEYDOWN(VK_UP)||KEYDOWN(0x57))
+    return 1;
+    if(KEYDOWN(VK_DOWN)||KEYDOWN(0x53))
+    return 4;
+    if(KEYDOWN(VK_LEFT)||KEYDOWN(0x41))
+    return 2;
+    if(KEYDOWN(VK_RIGHT)||KEYDOWN(0x44))
+    return 3;
+    return 0;
+}
+void screen(){
     string maze[33];int i=0;
     maze[0]="==================================================";
     maze[15]="|================================================|";

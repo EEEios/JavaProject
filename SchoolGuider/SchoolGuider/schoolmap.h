@@ -52,23 +52,12 @@ typedef struct{
 }SchoolMap;
 
 
-/**
- *用户端功能:
- *  1.查询两点之间的最短距离；
- *  2.查询周围景点；
- *  3.查询停车场使用情况；
- *管理端功能：
- *  1.包含用户端功能
- *  2.增删景点节点
- *  3.查询停车场使用情况；
- */
-void init(SchoolMap &M);
+void init(SchoolMap &M);    //初始化
 void createMap(SchoolMap *M);   //创建地图
 int getPosId(SchoolMap &M, string name); //获取目标位置id
 void queryShortEdge(SchoolMap *M); //查询两地之间的最短路线
 void queryAround(SchoolMap *M); //搜索周围景点
-void addPos(SchoolMap *M);
-void deletePost(SchoolMap *M);
+
 /**
  *  初始化图
  *  参数：SchoolMap引用
@@ -120,6 +109,10 @@ string getPosByIdx(SchoolMap *M, int idx){
     return M->pos[idx].name;
 }
 
+/**
+ *  获得两点最短路径
+ *  参数：SchoolMap指针、int容器、startPos：起始位置、endPos：结束位置、midPos：内部点
+ */
 void findShortRoute(SchoolMap *M, vector<int> &route, int startPos, int endPos, int midPos){
     if(startPos==endPos) return;
     int nextMidPos;

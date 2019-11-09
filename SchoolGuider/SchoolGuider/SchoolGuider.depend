@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1573233257 source:c:\users\e10s\desktop\schoolguider\schoolguider\main.cpp
+1573268654 source:c:\users\e10s\desktop\schoolguider\schoolguider\main.cpp
 	"stdio.h"
 	"stdlib.h"
 	"iostream"
@@ -20,10 +20,41 @@
 	"string.h"
 	"vector"
 
-1573233237 c:\users\e10s\desktop\schoolguider\schoolguider\user.h
+1573268743 c:\users\e10s\desktop\schoolguider\schoolguider\user.h
 	"stdio.h"
 	"stdlib.h"
 	"iostream"
+	"conio.h"
+	"fstream"
+
+1573272840 source:d:\git\eeeios\javaproject\schoolguider\schoolguider\main.cpp
+	"stdio.h"
+	"stdlib.h"
+	"iostream"
+	"string"
+	"string.h"
+	"sstream"
+	"conio.h"
+	"fstream"
+	"schoolmap.h"
+	"user.h"
+
+1573273114 d:\git\eeeios\javaproject\schoolguider\schoolguider\schoolmap.h
+	"stdio.h"
+	"iomanip"
+	"stdlib.h"
+	"iostream"
+	"string"
+	"string.h"
+	"vector"
+
+1573273103 d:\git\eeeios\javaproject\schoolguider\schoolguider\user.h
+	"stdio.h"
+	"stdlib.h"
+	"iostream"
+	"string"
+	"string.h"
+	"sstream"
 	"conio.h"
 	"fstream"
 

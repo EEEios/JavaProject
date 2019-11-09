@@ -10,6 +10,10 @@
 #include "user.h"
 using namespace std;
 
+int menu(){
+
+}
+
 int main()
 {
 
@@ -30,10 +34,8 @@ int main()
 //    }
 
 
-//    SchoolMap *M=(SchoolMap *)malloc(sizeof(SchoolMap));
-//    init(*M);
-//
-//    queryShortEdge(M);
-//
-//    queryAllPos(M);
+    SchoolMap *M=(SchoolMap *)malloc(sizeof(SchoolMap));
+    init(*M);
+
+    queryShortEdge(M);
 }
