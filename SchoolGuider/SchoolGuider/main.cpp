@@ -36,6 +36,10 @@ int main()
 
     SchoolMap *M=(SchoolMap *)malloc(sizeof(SchoolMap));
     init(*M);
+    addPos(M);
+//    queryShortEdge(M);
+//    queryAllPos(M);
+//    WriteMapFile(M);
 
-    queryShortEdge(M);
+
 }

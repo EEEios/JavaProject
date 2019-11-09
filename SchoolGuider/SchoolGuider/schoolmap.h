@@ -47,6 +47,7 @@ typedef struct{
     position pos[MAX_POS_NUM];
     int Edge[MAX_POS_NUM][MAX_POS_NUM]; //记录权值
     FloyNode FolyedMap[MAX_POS_NUM][MAX_POS_NUM];
+    int lastId;
     int vn;
     int en;
 }SchoolMap;
@@ -125,15 +126,9 @@ void findShortRoute(SchoolMap *M, vector<int> &route, int startPos, int endPos, 
         nextMidPos=M->FolyedMap[midPos][endPos].interalNode[0];
         findShortRoute(M, route, midPos, endPos, nextMidPos);
     }
-
 }
 
-/**
- *  程序初始化
- *  参数：SchoolMap引用
- */
-void init(SchoolMap &M){
-
+void printMap(){
     string visualSchoolMap[]={
         "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
         "┃  ╭──────────╮                                                                ╭─────────╮     ┃",
@@ -156,43 +151,37 @@ void init(SchoolMap &M){
     for(int i=0;i<(int)(sizeof(visualSchoolMap)/sizeof(visualSchoolMap[0]));i++){
         cout<<visualSchoolMap[i]<<endl;
     }
+}
 
-
+/**
+ *  程序初始化
+ *  参数：SchoolMap引用
+ */
+void init(SchoolMap &M){
+    printMap();
     createMap(M);
 
-    M.vn = 6;
-    M.en = 8;
-
-    M.Edge[0][1]=800;
-    M.Edge[0][2]=2000;
-    M.Edge[2][3]=400;
-    M.Edge[2][4]=200;
-    M.Edge[5][1]=3500;
-    M.Edge[5][3]=1000;
-    M.Edge[5][4]=600;
-
-    M.Edge[1][0]=800;
-    M.Edge[2][0]=2000;
-    M.Edge[3][2]=400;
-    M.Edge[4][2]=200;
-    M.Edge[1][5]=3500;
-    M.Edge[3][5]=1000;
-    M.Edge[4][5]=600;
-
-    position pos[M.vn]={
-        {1,"泰山区","泰山宿舍区"},
-        {2,"启林区","启林宿舍区"},
-        {3,"行政楼","行政区域"},
-        {4,"图书馆","华农图书总馆"},
-        {5,"校史馆","校史景点区"},
-        {6,"华山区","华山宿舍区"}
-    };
-
-    for(int i=0;i<M.vn;i++){
-        M.pos[i].id = pos[i].id;
-        M.pos[i].intro=pos[i].intro;
-        M.pos[i].name=pos[i].name;
+    FILE *mapfp = fopen("mapEdge.txt","r");
+    if(NULL == mapfp){
+        cout<<"文件打开失败，请重启软件"<<endl;
+        return;
     }
+    fscanf(mapfp,"%d %d",&M.vn,&M.en);
+    for(int i=0;i<M.vn;i++)
+        for(int j=0;j<M.vn;j++)
+            fscanf(mapfp,"%d",&M.Edge[i][j]);
+    fclose(mapfp);
+
+    FILE *posfp = fopen("pos.txt","r");
+    char name[100];
+    char intro[200];
+    for(int i=0;i<M.vn;i++){
+        fscanf(posfp,"%d %s %s",&M.pos[i].id,name,intro);
+        M.pos[i].name=name;
+        M.pos[i].intro=intro;
+        M.lastId=M.pos[i].id;
+    }
+    fclose(posfp);
 
     //Floyed图初始化
     for(int i=0;i<M.vn;i++){
@@ -215,6 +204,52 @@ void init(SchoolMap &M){
     }
 }
 
+
+void addPos(SchoolMap *M){
+    //建立点
+    string name;
+    string intro;
+    cout<<"输入新增景点名称：";
+    cin>>name;
+    cout<<"输入新增景点简介：";
+    cin>>intro;
+
+    int idx=M->vn;
+    M->vn++;
+    M->lastId++;
+    M->pos[idx].id=M->lastId;
+    M->pos[idx].name=name;
+    M->pos[idx].intro=intro;
+    M->Edge[idx][idx]=0;
+
+    //Edge增加前的预处理
+    for(int i=0;i<idx;i++){
+        M->Edge[i][idx]=INF;
+        M->Edge[idx][i]=INF;
+    }
+
+    //建立边
+    int routeNum,dis;   //dis：距离
+    string des; //des：目的地
+    cout<<"输入新增道路数目：";
+    cin>>routeNum;
+    M->en+=routeNum;
+    for(int i=0;i<routeNum;i++){
+        cout<<"输入目的地和距离（中间用空格分隔）：";
+        cin>>des>>dis;
+        M->Edge[getPosId(M,des)-1][idx]=dis;
+        M->Edge[idx][getPosId(M,des)-1]=dis;
+    }
+
+    cout<<"操作成功"<<endl;
+//    for(int i=0;i<M->vn;i++){
+//        for(int j=0;j<M->vn;j++){
+//            cout<<M->Edge[i][j]<<" ";
+//        }
+//        cout<<endl;
+//    }
+}
+
 /**
  *  根据foly图获得最短距离，并对路线进行排序
  *  参数：SchoolMap引用
@@ -234,7 +269,7 @@ void queryShortEdge(SchoolMap *M){
     int endIdx = endPosId-1;
     int pathFinder = startIdx;
     int len=M->FolyedMap[startIdx][endIdx].interalNode.size();
-    int n=0,useFlag[len]={0};
+    int n=0,useFlag[len+1]={0};
     int i,j,nextNode;
 
     cout<<"距离为："<<M->FolyedMap[startIdx][endIdx].distance<<endl;
@@ -260,6 +295,25 @@ void queryShortEdge(SchoolMap *M){
         }
     }
     cout<<M->pos[endIdx].name<<endl;
+}
+
+void WriteMapFile(SchoolMap *M){
+    ofstream mapFile("mapEdge.txt");
+    mapFile<<M->vn<<" "<<M->en<<endl;
+    for(int i=0;i<M->vn;i++){
+        for(int j=0;j<M->vn;j++){
+            mapFile<<M->Edge[i][j]<<" ";
+        }
+        mapFile<<endl;
+    }
+    mapFile.close();
+
+    ofstream posFile("pos.txt");
+    for(int i=0;i<M->vn;i++){
+        posFile<<M->pos[i].id<<" "<<M->pos[i].name<<" "<<M->pos[i].intro<<endl;;
+    }
+
+    posFile.close();
 }
 
 /**

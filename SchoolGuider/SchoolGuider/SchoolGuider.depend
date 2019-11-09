@@ -58,3 +58,34 @@
 	"conio.h"
 	"fstream"
 
+1573280229 source:c:\users\e10s\desktop\temp\schoolguider\schoolguider\main.cpp
+	"stdio.h"
+	"stdlib.h"
+	"iostream"
+	"string"
+	"string.h"
+	"sstream"
+	"conio.h"
+	"fstream"
+	"schoolmap.h"
+	"user.h"
+
+1573281913 c:\users\e10s\desktop\temp\schoolguider\schoolguider\schoolmap.h
+	"stdio.h"
+	"iomanip"
+	"stdlib.h"
+	"iostream"
+	"string"
+	"string.h"
+	"vector"
+
+1573277113 c:\users\e10s\desktop\temp\schoolguider\schoolguider\user.h
+	"stdio.h"
+	"stdlib.h"
+	"iostream"
+	"string"
+	"string.h"
+	"sstream"
+	"conio.h"
+	"fstream"
+
