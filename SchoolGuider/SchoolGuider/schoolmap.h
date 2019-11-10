@@ -153,6 +153,27 @@ void printMap(){
     }
 }
 
+void Foly(SchoolMap *M){
+    for(int i=0;i<M.vn;i++){
+        for(int j=0;j<M.vn;j++)
+            M.FolyedMap[i][j].distance=M.Edge[i][j];
+    }
+
+    for(int k=0; k<M.vn; k++){
+        for(int i=0; i<M.vn; i++){
+            for(int j=0; j<M.vn; j++){
+                if(i==k||j==k)
+                    continue;
+                if(M.FolyedMap[i][k].distance+M.FolyedMap[k][j].distance < M.FolyedMap[i][j].distance){
+                        M.FolyedMap[i][j].distance=M.FolyedMap[i][k].distance+M.FolyedMap[k][j].distance;
+                        M.FolyedMap[i][j].interalNode.clear();
+                        findShortRoute(&M,M.FolyedMap[i][j].interalNode,i,j,k);
+                }
+            }
+        }
+    }
+}
+
 /**
  *  程序初始化
  *  参数：SchoolMap引用
@@ -184,24 +205,7 @@ void init(SchoolMap &M){
     fclose(posfp);
 
     //Floyed图初始化
-    for(int i=0;i<M.vn;i++){
-        for(int j=0;j<M.vn;j++)
-            M.FolyedMap[i][j].distance=M.Edge[i][j];
-    }
-
-    for(int k=0; k<M.vn; k++){
-        for(int i=0; i<M.vn; i++){
-            for(int j=0; j<M.vn; j++){
-                if(i==k||j==k)
-                    continue;
-                if(M.FolyedMap[i][k].distance+M.FolyedMap[k][j].distance < M.FolyedMap[i][j].distance){
-                        M.FolyedMap[i][j].distance=M.FolyedMap[i][k].distance+M.FolyedMap[k][j].distance;
-                        M.FolyedMap[i][j].interalNode.clear();
-                        findShortRoute(&M,M.FolyedMap[i][j].interalNode,i,j,k);
-                }
-            }
-        }
-    }
+    Foly(&M);
 }
 
 
@@ -240,7 +244,7 @@ void addPos(SchoolMap *M){
         M->Edge[getPosId(M,des)-1][idx]=dis;
         M->Edge[idx][getPosId(M,des)-1]=dis;
     }
-
+    Foly(M);
     cout<<"操作成功"<<endl;
 //    for(int i=0;i<M->vn;i++){
 //        for(int j=0;j<M->vn;j++){
