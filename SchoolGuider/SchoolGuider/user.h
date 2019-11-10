@@ -4,11 +4,14 @@
 #endif // USER_H_INCLUDED
 #include "stdio.h"
 #include "stdlib.h"
+#include "windows.h"
 #include "iostream"
 #include "string"
 #include "string.h"
 #include "sstream"
 #include "conio.h"
+#include <stdexcept>
+#include <limits>
 #include "fstream"
 using namespace std;
 
@@ -116,7 +119,8 @@ pUser checkUserByName(pUser users, char* name){
  * 返回：密码错误，用户不存在返回false；
  *       登录成功返回true；
  */
-bool login(pUser users){
+int login(pUser users){
+    cout<<"";
     char name[50],password[50];
     pUser buf = (pUser)malloc(sizeof(User));
     cout<<"请输入账号：";
@@ -124,14 +128,22 @@ bool login(pUser users){
     cout<<"请输入密码：";
     inputPassword(password);
     if(!(buf=checkUserByName(users, name))){
-        cout<<"用户不存在";
-        return false;
+        cout<<endl<<"用户不存在"<<endl;
+        system("pause");
+        return -1;
     }
-    if(!strcmp(buf->password, password)){
-        cout<<"密码错误";
-        return false;
+    if(strcmp(buf->password, password)!=0){
+        cout<<endl<<"密码错误"<<endl;
+        system("pause");
+        return -1;
     }
-    return true;
+    system("cls");
+    if(buf->power==0)
+        cout<<endl<<"登录成功。欢迎你，"<<buf->name<<endl;
+    else if(buf->power==1)
+        cout<<endl<<"登录成功。正在进入后台..."<<endl;
+    Sleep(500);
+    return buf->power;
 }
 
 /**
@@ -150,14 +162,14 @@ string checkPower(int power){
  */
 void userDelete(pUser users){
     pUser userL=users;
-    int userId;
-    cout<<"请输入要删除的用户的编号：";
-    cin>>userId;
     pUser userR=userL->next;
-    pUser buf;
+    pUser buf=(pUser)malloc(sizeof(User));
+    string user;
+    cout<<"请输入要删除的用户的用户名：";
+    cin>>user;
     char flag;
     while(userR->next!=NULL){
-        if(userR->id == userId){
+        if(userR->name == user){
             cout<<"该用户信息为："<<endl;
             cout<<"name: "<<userR->name<<endl;
             cout<<"password: "<<userR->password<<endl;
@@ -170,6 +182,8 @@ void userDelete(pUser users){
                     buf=userR;
                     userR=userR->next;
                     free(buf);
+                    cout<<"________________"<<user<<endl;
+                    cout<<"已删除用户"<<user<<endl;
                     return;
                 }else if(flag=='n'||flag=='N'){
                     return;
@@ -178,6 +192,8 @@ void userDelete(pUser users){
                 }
             }while(1);
         }
+        userL=userR;
+        userR=userR->next;
     }
     cout<<"用户不存在"<<endl;
 }
@@ -191,12 +207,23 @@ void userRegister(pUser users){
     char password[50],conPassword[50];
     string temp;
     cout<<"创建账号"<<endl;
-    cout<<"请输入账号：";
-    cin>>name;
-    while(checkUserByName(users,name)!=NULL){
-        cout<<"用户已存在，请重新输入账号：";
+    cout<<"-------------------"<<endl;
+    do{
+        cout<<"请输入账号：";
         cin>>name;
-    }
+        if(checkUserByName(users,name)!=NULL){
+            char flag;
+            while(1){
+                cout<<"账号已存在！是否创建其他账号（Y/N）：";
+                cin>>flag;
+                if(flag=='n'||flag=='N'){
+                    return;
+                }
+                if(flag=='y'||flag=='Y') break;
+                else cout<<"输入错误"<<endl;
+            }
+        }
+    }while(checkUserByName(users,name)!=NULL);
     int flag=0;
     //*号处理密码
     do{
@@ -219,7 +246,8 @@ void userRegister(pUser users){
     strcpy(newUser->name,name);
     strcpy(newUser->password,password);
     userAdd(users, newUser);
-    cout<<"操作成功"<<endl;
+    cout<<"注册成功"<<endl;
+    system("pause");
 }
 
 /**
@@ -236,14 +264,14 @@ void queryAllUser(pUser users){
 }
 
 /**
- * 根据id返回用户
- * 参数：users：用户链表，id：用户id
- * 返回：成功返回id对应用户，否则返回NULL
+ * 根据用户名返回用户
+ * 参数：users：用户链表，Name：用户名
+ * 返回：成功返回Name对应用户，否则返回NULL
  */
-pUser queryUserById(pUser users,int id){
+pUser queryUserByName(pUser users,string Name){
     pUser user=users->next;
     while(user!=NULL){
-        if(user->id==id) return user;
+        if(user->name==Name) return user;
         user=user->next;
     }
     return NULL;
@@ -254,11 +282,12 @@ pUser queryUserById(pUser users,int id){
  * 参数：users：用户链表
  */
 void updateUser(pUser users){
-    int userId;
+    string userName;
     pUser user;
-    cout<<"请输入要修改的用户的编号：";
-    cin>>userId;
-    if((user=queryUserById(users, userId))==NULL){
+    cout<<"请输入要修改的用户的用户名：";
+    cin>>userName;
+
+    if((user=queryUserByName(users, userName))==NULL){
         cout<<"用户不存在"<<endl;
         return;
     }
@@ -280,6 +309,7 @@ void updateUser(pUser users){
     cout<<"2. 密码"<<endl;
     cout<<"3. 用户身份"<<endl;
     cout<<"(输入0为确认输入并退出,9为放弃修改)"<<endl;
+    cout<<"-------------------"<<endl;
     while(1){
         cout<<"选择要修改的内容：";
         cin>>in;
@@ -288,6 +318,7 @@ void updateUser(pUser users){
                 strcpy(user->name,buf->name);
                 strcpy(user->password,buf->password);
                 user->power=buf->power;
+                cout<<"修改成功"<<endl;
                 return;
             case 9:
                 free(buf);
@@ -295,6 +326,10 @@ void updateUser(pUser users){
             case 1:
                 cout<<"修改用户名为：";
                 cin>>buf->name;
+                if(queryUserByName(users,buf->name)!=NULL){
+                    cout<<"====该用户已存在===="<<endl;
+                    break;
+                }
                 break;
             case 2:
                 cout<<"修改密码为：";
